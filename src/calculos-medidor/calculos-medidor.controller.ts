@@ -11,14 +11,18 @@ import {
   Res, 
   NotFoundException,
   InternalServerErrorException,
-  Logger
+  Logger,
+  UseGuards,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CalculosMedidorService } from './calculos-medidor.service';
 import { CreateCalculoMedidorDto } from './dto/create-calculo-medidor.dto';
 import { memoryStorage } from 'multer';
 import type { Response } from 'express';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Public } from '../auth/decorators/public.decorator';
 
+@UseGuards(JwtAuthGuard)
 @Controller('calculos-medidor')
 export class CalculosMedidorController {
   private readonly logger = new Logger(CalculosMedidorController.name);
@@ -29,6 +33,7 @@ export class CalculosMedidorController {
    * Crea un nuevo cálculo de medidor
    * Acepta dos archivos: fotoAnterior y fotoActual
    */
+  @Public()
   @Post()
   @UseInterceptors(FileFieldsInterceptor([
     { name: 'fotoAnterior', maxCount: 1 },
@@ -168,6 +173,7 @@ export class CalculosMedidorController {
   /**
    * Obtiene la foto de medición anterior
    */
+  @Public()
   @Get(':id/foto-anterior')
   async getFotoAnterior(@Param('id') id: string, @Res() res: Response) {
     const resource = await this.calculosMedidorService.getFotoAnteriorResource(id);
@@ -188,6 +194,7 @@ export class CalculosMedidorController {
   /**
    * Obtiene la foto de medición actual
    */
+  @Public()
   @Get(':id/foto-actual')
   async getFotoActual(@Param('id') id: string, @Res() res: Response) {
     const resource = await this.calculosMedidorService.getFotoActualResource(id);

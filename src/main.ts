@@ -5,6 +5,7 @@ import * as bodyParser from 'body-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -56,6 +57,9 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
   });
+
+  // Configurar filtro global de excepciones
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Configurar validación global
   app.useGlobalPipes(new ValidationPipe({
